@@ -8,14 +8,15 @@ $app = new \Slim\App();
 $app->post('/add' , function (Request $request,Response $response,$args){
     $data=$request->getParsedBody();
     $userObj = new \App\controllers\LoginController();
-    $result =$userObj->createUser($data["name"],$data["userName"],$data["password"],$data["mobileNumber"]);
+    $result =$userObj->signUp($data["name"],$data["userName"],$data["password"],$data["mobileNumber"]);
     return $response->withJson($result);
 });
 
-$app->get('/user/{username}', function (Request $request, Response $response, $args) {
+$app->get('/user/{username}/{password}', function (Request $request, Response $response, $args) {
     $username = $args['username'];
+    $password = $args['password'];
     $userObj = new \App\controllers\LoginController();
-    $userData = $userObj->getUserByUsername($username);
+    $userData = $userObj->userLogin($username ,$password);
     return $response->withJson($userData);
 });
 
