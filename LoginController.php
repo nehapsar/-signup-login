@@ -3,9 +3,10 @@
 namespace App\controllers;
 
 class LoginController{
-  
+ 
     public $user = [];
-    public function createUser($name, $userName, $password, $mobileNumber){
+    public $jsonFile = "userdetails.json";
+    public function signUp($name, $userName, $password, $mobileNumber){
         if (!preg_match('/^[A-Za-z]+$/', $name) || !preg_match('/^[A-Za-z]{1,10}\d{0,10}$/', $userName)||!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/', $password) || !preg_match('/^[0-9]{10}$/', $mobileNumber)) {
             return ["error" => "Invalid Input"];
         }
@@ -15,51 +16,46 @@ class LoginController{
         }
 
         $this->addUserDetails($name, $userName, $password, $mobileNumber);
-        return ["message" => "Accountt created successfully"];
+        return ["message" => "Account created successfully"];
 
     }
-
-
-    public function isUsernameExists($userName){
-        $jsonFile = "userdetails.json";
-        if (file_exists($jsonFile)) {
-            $currentData = file_get_contents($jsonFile);
-            $currentArray = json_decode($currentData, true);
-            foreach ($currentArray['user'] as $user) {
-                if ($user['username'] == $userName) {
-                    return true;
-                }
+    
+    protected function isUsernameExists($userName){
+        $currentData = file_get_contents($this->jsonFile);
+        $currentArray = json_decode($currentData, true);
+        foreach ($currentArray['user'] as $user) {
+            if ($user['username'] == $userName) {
+                return true;
             }
         }
 
         return false;
     }
 
-    public function addUserDetails($name, $userName, $password, $mobileNumber){
-        $jsonFile = "userdetails.json";
-        if (!file_exists($jsonFile)) {
-            file_put_contents($jsonFile, '{"user": []}');
+    protected function addUserDetails($name, $userName, $password, $mobileNumber){
+        if (!file_exists($this->jsonFile)) {
+            file_put_contents($this->jsonFile, '{"user": []}');
         }
 
-        $currentData = file_get_contents($jsonFile);
+        $currentData = file_get_contents($this->jsonFile);
         $currentArray = json_decode($currentData, true);
         $inputData = ["name" => $name, "username" => $userName, "password" => $password, "mobileNumber" => $mobileNumber];
         $currentArray['user'][] = $inputData;
         $jsonData = json_encode($currentArray);
-        file_put_contents($jsonFile, $jsonData);
+        file_put_contents($this->jsonFile, $jsonData);
     }
 
-    public function getUserByUsername($username){
-        $jsonFile = "userdetails.json";
-        $currentData = file_get_contents($jsonFile);
+    public function userLogin($username, $password){
+        $currentData = file_get_contents($this->jsonFile);
         $currentArray = json_decode($currentData, true);
         foreach ($currentArray['user'] as $user){
-            if ($user['username'] == $username) {
+            if ($user['username'] == $username && $user['password'] == $password) {
+                echo "login successfull";
                 return $user;
             }
         }
 
-        return ["message"=>"user not found"];
+        return ["message" => "user not exist"];
     }
 
     public function getAllUserInformation() {
@@ -67,4 +63,6 @@ class LoginController{
         $currentData = file_get_contents($jsonFile);
         return $currentData;
     }
+
+
 }
