@@ -20,6 +20,13 @@ $app->get('/user/{username}/{password}', function (Request $request, Response $r
     return $response->withJson($userData);
 });
 
+$app->get('/getUser/{username}',function (Request $request,Response $response,$args){
+    $username=$args['username'];
+    $userObj = new \App\controllers\LoginController();
+    $userData = $userObj->userInfo($username);
+    return $response->withJson($userData);
+});
+
 $app->get('/userAll', function (Request $request, Response $response, $args) {
     $userObj = new \App\controllers\LoginController();
     $userData = $userObj->getAllUserInformation();
