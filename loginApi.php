@@ -35,4 +35,4 @@ $app->get('/userAll', function (Request $request, Response $response, $args) {
 
 $app->run();
 
-?>
+
